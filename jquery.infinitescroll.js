@@ -1,7 +1,7 @@
 /*!
 // Infinite Scroll jQuery plugin
 // copyright Paul Irish, licensed GPL & MIT
-// version 2.0b1.110518
+// version 2.0b1.110524
 
 // home and docs: http://www.infinite-scroll.com
 */
@@ -133,7 +133,7 @@
         var relurl = /(.*?\/\/).*?(\/.*)/,
         	path = $(opts.nextSelector).attr('href');
 
-        //
+        // if there's not path, return
         if (!path) { debug('Navigation selector not found'); return; }
 
 
@@ -142,7 +142,7 @@
 
 
         // Define loadingMsg
-        props.loadingMsg = $('<div id="infscr-loading" style="text-align: center;"><img alt="Loading..." src="' + opts.loadingImg + '" /><div>' + opts.loadingText + '</div></div>');
+        props.loadingMsg = $('<div id="infscr-loading"><img alt="Loading..." src="' + opts.loadingImg + '" /><div>' + opts.loadingText + '</div></div>');
 
         // Preload loadingImg
         (new Image()).src = opts.loadingImg;
@@ -181,6 +181,8 @@
             nextSelector: "div.navigation a:first",
             loadingImg: "http://www.infinite-scroll.com/loading.gif",
             loadingText: "<em>Loading the next set of posts...</em>",
+            loadingStart: null,
+            loadingEnd: null,
             donetext: "<em>Congratulations, you've reached the end of the internet.</em>",
             navSelector: "div.navigation",
             contentSelector: null,           // not really a selector. :) it's whatever the method was called on..
@@ -209,6 +211,7 @@
         },
         loadingImg: undefined,
         loadingMsg: undefined,
+        loadingSelector: undefined,
         currDOMChunk: null  // defined in setup()'s load()
     };
 
@@ -277,7 +280,8 @@
     		path = opts.path, // get this
     		box, frag, desturl, method, condition,
     		pageNum = pageNum || null,
-    		getPage = (!!pageNum) ? pageNum : opts.currPage;
+    		getPage = (!!pageNum) ? pageNum : opts.currPage,
+    		loadingFunction = ($.isFunction(opts.loadingStart)) ? opts.loadingStart : 'nah';
 
 
         // If using retrieve method from a manual call, return
@@ -292,6 +296,8 @@
         // show the loading message quickly
         // then hide the previous/next links after we're
         // sure the loading message was visible
+        
+        // loadingStart or basic function
         props.loadingMsg.appendTo(opts.loadMsgSelector).show(opts.loadingMsgRevealSpeed, function () {
 
             $(opts.navSelector).hide();
@@ -412,6 +418,7 @@
         }
 
         // fadeout currently makes the <em>'d text ugly in IE6
+        // loadingEnd
         props.loadingMsg.fadeOut('normal');
 
 
