@@ -170,39 +170,32 @@
 		
 		},
 		
-		// Show done message
-		_donemsg: function infscr_donemsg() {
-		},
-		
 		// Custom error
 		_error: function infscr_error(xhr) {
 		
 			var opts = this.options;
 			
-			console.log(this);
-			this._debug('error',xhr);
-			
-			if (xhr !== 'destroy' || xhr !== 'end') {
+			if (xhr !== 'destroy' && xhr !== 'end') {
 				xhr = 'unknown';
 			}
 			
-			if (xhr=='end') {
+			this._debug('Error',xhr);
+			
+			if (xhr == 'end') {
 				this._showdonemsg();
 			}
 			
-			this._debug('Error,'+xhr);
-			
-	        opts.isDone = true;
+			opts.isDone = true;
 	        opts.currPage = 1; // if you need to go back to this instance
 	        opts.isPaused = false;
 	        this.binding('unbind');
 		
 		},
 		
+		// Load Callback
 		_loadcallback: function infscr_loadcallback(box,data) {
 		
 			var opts = this.options,
-	    		error = this._error,
 	    		callback = this._callback, // GLOBAL OBJECT FOR CALLBACK
 	    		result = (opts.isDone) ? 'done' : (!opts.appendCallback) ? 'no-append' : 'append',
 	    		frag;
@@ -231,7 +224,7 @@
 	
 	                // if it didn't return anything
 	                if (children.length == 0) {
-	                    return error('end');
+	                    return this._error('end');
 	                }
 	
 	
@@ -285,6 +278,23 @@
 		
 		},
 		
+		// Show done message
+		_showdonemsg: function infscr_showdonemsg() {
+		
+			var opts = this.options;
+			
+			opts.loadingMsg
+	    		.find('img')
+	    		.hide()
+	    		.parent()
+	    		.find('div').html(opts.donetext).animate({ opacity: 1 }, 2000, function () {
+	    		    $(this).parent().fadeOut('normal');
+	    		});
+
+	        // user provided callback when done    
+	        opts.errorCallback();
+		
+		},
 		
 		// grab each selector option and see if any fail
 		_validate: function infscr_validate(opts) {
@@ -389,10 +399,7 @@
 			// we dont want to fire the ajax multiple times
 	        opts.isDuringAjax = true;
 	
-			this._debug(this);
-			// debug(this);
-	        
-	        // this is where the loadingStart function goes!!!
+			// this is where the loadingStart function goes!!!
 	        //($.isFunction(opts.loadingStart)) ? opts.loadingStart() : /* default*/ '';
 	        
 	        opts.loadingMsg.appendTo(opts.loadMsgSelector).show(opts.loadingMsgRevealSpeed, function () {
