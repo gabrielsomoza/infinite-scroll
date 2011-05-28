@@ -13,10 +13,10 @@
 
 (function(window,$,undefined){
 
-	$.infinitescroll = function infscr(options,element) {
+	$.infinitescroll = function infscr(options,callback,element) {
 	
 		this.element = $(element);
-		this._create(options);
+		this._create(options,callback);
 		
 	};
 	
@@ -66,10 +66,7 @@
 		----------------------------
 		*/
 		
-		_callback: function infscr_callback() {
-		},
-		
-		_create: function infscr_create(options) {
+		_create: function infscr_create(options,callback) {
 		
 			var debug = this._debug;
 			
@@ -111,7 +108,7 @@
 	        
 	        // callback loading
 	        // FIX
-	        opts.callback = 'something';
+	        opts.callback = callback || function(){};
 	        
 	        // Setup binding
 	        this.binding('bind');
@@ -196,7 +193,7 @@
 		_loadcallback: function infscr_loadcallback(box,data) {
 		
 			var opts = this.options,
-	    		callback = this._callback, // GLOBAL OBJECT FOR CALLBACK
+	    		callback = this.options.callback, // GLOBAL OBJECT FOR CALLBACK
 	    		result = (opts.isDone) ? 'done' : (!opts.appendCallback) ? 'no-append' : 'append',
 	    		frag;
 	
@@ -261,7 +258,7 @@
 	        }
 	
 	        if (!opts.animate) opts.isDuringAjax = false; // once the call is done, we can allow it again.
-	
+	        
 	        callback.call($(opts.contentSelector)[0], data);
 		
 		},
@@ -269,7 +266,7 @@
 		_nearbottom: function infscr_nearbottom() {
 		
 			var opts = this.options,
-	        	pixelsFromWindowBottomToBottom = 0 + $(document).height() - (opts.binder.scrollTop() || $(window.ownerDocument.body).scrollTop()) - $(window).height();
+	        	pixelsFromWindowBottomToBottom = 0 + $(document).height() - (opts.binder.scrollTop()) - $(window).height();
 	
 	        this._debug('math:', pixelsFromWindowBottomToBottom, opts.pixelsFromNavToBottom);
 	
@@ -491,11 +488,11 @@
 	
 	*/
 	
-	$.fn.infinitescroll = function infscr_init(options) {
+	$.fn.infinitescroll = function infscr_init(options,callback) {
 	
 		
 		var thisCall = typeof options;
-			
+		
 		switch(thisCall) {
 		
 			// method
@@ -532,12 +529,12 @@
 					if (instance) {
 						
 						// go for it
-						instance._create(options);
+						// instance._create(options);
 						
 					} else {
 					
 						// initialize new instance
-						$.data(this,'infinitescroll',new $.infinitescroll(options,this));
+						$.data(this,'infinitescroll',new $.infinitescroll(options,callback,this));
 					
 					}
 				
