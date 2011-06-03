@@ -508,10 +508,12 @@
 
                     if (!instance) {
                         // not setup yet
-                        return $.error('Method ' + options + ' cannot be called until Infinite Scroll is setup');
+                        // return $.error('Method ' + options + ' cannot be called until Infinite Scroll is setup');
+						return false;
                     }
                     if (!$.isFunction(instance[options]) || options.charAt(0) === "_") {
-                        return $.error('No such method ' + options + ' for Infinite Scroll');
+                        // return $.error('No such method ' + options + ' for Infinite Scroll');
+						return false;
                     }
 
                     // no errors!
